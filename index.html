@@ -37,55 +37,61 @@
     <!-- PLAYER DASHBOARD -->
     <div id="playerScreen" class="hidden min-h-screen pb-20">
         <header class="bg-blue-900 text-white p-4 shadow-md sticky top-0 z-10 flex justify-between items-center">
-            <h1 class="text-xl font-bold" id="playerWelcome">Daily Wellness</h1>
-            <button onclick="logout()" class="text-sm bg-red-500 px-3 py-1 rounded">Logout</button>
+            <h1 class="text-xl font-bold" id="playerWelcome" data-i18n="dailyWellness">Daily Wellness</h1>
+            <div class="flex items-center space-x-3">
+                <select id="languageSelect" onchange="switchLanguage(this.value)" class="text-gray-900 text-sm p-1 rounded font-medium border-0 focus:ring-2 focus:ring-blue-500">
+                    <option value="en">English</option>
+                    <option value="ny">Chichewa</option>
+                </select>
+                <button onclick="logout()" class="text-sm bg-red-500 px-3 py-1 rounded font-bold hover:bg-red-600">Logout</button>
+            </div>
         </header>
 
         <main class="p-4 max-w-md mx-auto space-y-6">
             
             <!-- PART 1: BEFORE TRAINING -->
             <form id="preTrainingForm" class="bg-white p-6 rounded-lg shadow-md space-y-6" onsubmit="submitPreTraining(event)">
-                <h2 class="text-xl font-bold border-b pb-2 text-blue-900">Before Training</h2>
+                <h2 class="text-xl font-bold border-b pb-2 text-blue-900" data-i18n="beforeTraining">Before Training</h2>
                 
                 <!-- Wellness Sliders -->
                 <div class="space-y-5">
                     <div>
-                        <label class="block text-sm font-medium mb-1">Sleep Quality <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
+                        <label class="block text-sm font-medium mb-1" data-i18n="sleep">Sleep Quality <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
                         <input type="range" id="sleepScore" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
                         <output class="text-blue-600 font-bold block text-center mt-1">5</output>
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium mb-1">Fatigue <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
+                        <label class="block text-sm font-medium mb-1" data-i18n="fatigue">Fatigue <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
                         <input type="range" id="fatigueScore" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
                         <output class="text-blue-600 font-bold block text-center mt-1">5</output>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium mb-1">Muscle Soreness <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
+                        <label class="block text-sm font-medium mb-1" data-i18n="muscle">Muscle Soreness <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
                         <input type="range" id="muscleScore" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
                         <output class="text-blue-600 font-bold block text-center mt-1">5</output>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium mb-1">Emotional Stress <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
+                        <label class="block text-sm font-medium mb-1" data-i18n="stress">Emotional Stress <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
                         <input type="range" id="stressScore" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
                         <output class="text-blue-600 font-bold block text-center mt-1">5</output>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium mb-1">Hydration <br><span class="text-xs text-gray-500">(10 Very Hydrated - 1 Severely Dehydrated)</span></label>
+                        <label class="block text-sm font-medium mb-1" data-i18n="hydration">Hydration <br><span class="text-xs text-gray-500">(10 Very Hydrated - 1 Severely Dehydrated)</span></label>
                         <input type="range" id="hydrationScore" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
                         <output class="text-blue-600 font-bold block text-center mt-1">5</output>
                     </div>
                 </div>
 
-                <h2 class="text-lg font-bold border-b pb-2 mt-8 text-blue-900">Medical Status</h2>
+                <h2 class="text-lg font-bold border-b pb-2 mt-8 text-blue-900" data-i18n="medicalStatus">Medical Status</h2>
 
                 <div class="space-y-4">
                     <!-- Conditionally Displayed Question -->
                     <div id="menstruationQuestion" class="hidden">
-                        <label class="block text-sm font-medium mb-1 text-purple-800">Menstrual Symptoms:</label>
+                        <label class="block text-sm font-medium mb-1 text-purple-800" data-i18n="menstrual">Menstrual Symptoms:</label>
                         <select id="menstruationStatus" class="w-full p-2 border rounded border-gray-300 bg-gray-50">
                             <option>No</option>
                             <option>Yes</option>
@@ -93,7 +99,7 @@
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium mb-1">Do you have an injury today?</label>
+                        <label class="block text-sm font-medium mb-1" data-i18n="injury">Do you have an injury today?</label>
                         <select id="injuryStatus" class="w-full p-2 border rounded border-gray-300 bg-gray-50">
                             <option>No</option>
                             <option>Yes</option>
@@ -101,7 +107,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium mb-1">Do you feel ill today?</label>
+                        <label class="block text-sm font-medium mb-1" data-i18n="illness">Do you feel ill today?</label>
                         <select id="illnessStatus" class="w-full p-2 border rounded border-gray-300 bg-gray-50">
                             <option>No</option>
                             <option>Yes</option>
@@ -109,7 +115,7 @@
                     </div>
 
                     <div class="pt-2">
-                        <label class="block text-sm font-bold mb-1">Are you fit to train today?</label>
+                        <label class="block text-sm font-bold mb-1" data-i18n="fit">Are you fit to train today?</label>
                         <select id="fitStatus" class="w-full p-3 border-2 rounded border-blue-300 bg-blue-50 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option>Yes</option>
                             <option>No</option>
@@ -118,32 +124,32 @@
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-blue-600 text-white p-4 rounded font-bold hover:bg-blue-700 mt-6 shadow-md transition-colors">Submit Morning Readiness</button>
+                <button type="submit" id="btnSubmitMorning" class="w-full bg-blue-600 text-white p-4 rounded font-bold hover:bg-blue-700 mt-6 shadow-md transition-colors" data-i18n="submitMorning">Submit Morning Readiness</button>
             </form>
 
             <!-- PART 2: AFTER TRAINING (Hidden initially) -->
             <form id="postTrainingForm" class="hidden bg-white p-6 rounded-lg shadow-md space-y-6" onsubmit="submitPostTraining(event)">
-                <div class="bg-green-100 text-green-800 p-3 rounded text-sm mb-4 border border-green-200">
+                <div class="bg-green-100 text-green-800 p-3 rounded text-sm mb-4 border border-green-200" id="part1DoneMsg">
                     ✅ Morning readiness recorded. 
                 </div>
                 
-                <h2 class="text-xl font-bold border-b pb-2 text-blue-900">After Training</h2>
+                <h2 class="text-xl font-bold border-b pb-2 text-blue-900" data-i18n="afterTraining">After Training</h2>
                 
                 <div class="space-y-5">
                     <div>
-                        <label class="block text-sm font-medium mb-1">RPE Pitch Training <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
+                        <label class="block text-sm font-medium mb-1" data-i18n="pitch">RPE Pitch Training <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
                         <input type="range" id="pitchRpeScore" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
                         <output class="text-blue-600 font-bold block text-center mt-1">5</output>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium mb-1">RPE Gym Training <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
+                        <label class="block text-sm font-medium mb-1" data-i18n="gym">RPE Gym Training <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
                         <input type="range" id="gymRpeScore" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
                         <output class="text-blue-600 font-bold block text-center mt-1">5</output>
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-green-600 text-white p-4 rounded font-bold hover:bg-green-700 mt-6 shadow-md transition-colors">Submit Final Daily Data</button>
+                <button type="submit" id="btnSubmitFinal" class="w-full bg-green-600 text-white p-4 rounded font-bold hover:bg-green-700 mt-6 shadow-md transition-colors" data-i18n="submitFinal">Submit Final Daily Data</button>
             </form>
         </main>
     </div>
@@ -184,7 +190,6 @@
                             <th class="p-3 border-b">Medical Note</th>
                         </tr>
                     </thead>
-                    <!-- Update the table body in the Physio Dashboard -->
                     <tbody id="physioTableBody">
                         <tr>
                             <td colspan="4" class="p-3 text-center text-gray-500">Loading submissions...</td>
@@ -195,25 +200,21 @@
         </main>
     </div>
 
-    <!-- Add type="module" to allow importing Firebase tools -->
     <script type="module">
-        // 1. Import the Firebase tools directly from Google's servers
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, query, orderBy, doc, updateDoc, getDoc, where, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-        // 2. PASTE YOUR CONFIG HERE
-        // Replace this entire object with the one Firebase gave you
+        
         const firebaseConfig = {
-        apiKey: "AIzaSyAY1NMcQum8Ts_9Oq4-ag0ozozwI5wz95A",
-        authDomain: "ekariams.firebaseapp.com",
-        projectId: "ekariams",
-        storageBucket: "ekariams.firebasestorage.app",
-        messagingSenderId: "968465910110",
-        appId: "1:968465910110:web:09368e7cfd56387953a7cf",
-        measurementId: "G-GZVLJQCQZJ"
+            apiKey: "AIzaSyAY1NMcQum8Ts_9Oq4-ag0ozozwI5wz95A",
+            authDomain: "ekariams.firebaseapp.com",
+            projectId: "ekariams",
+            storageBucket: "ekariams.firebasestorage.app",
+            messagingSenderId: "968465910110",
+            appId: "1:968465910110:web:09368e7cfd56387953a7cf",
+            measurementId: "G-GZVLJQCQZJ"
         };
 
-        // 3. Start up Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -224,130 +225,191 @@
         let currentUserId = null;
         let currentUserName = "";
 
-        // 4. Our UI Logic 
-        // Because we are using a "module" script, we have to attach our functions 
-        // to the 'window' object so the HTML buttons can still find them.
+        // The Translation Dictionary
+        const translations = {
+            en: {
+                dailyWellness: "Daily Wellness",
+                beforeTraining: "Before Training",
+                sleep: "Sleep Quality <br><span class='text-xs text-gray-500'>(10 Very Good - 1 Very Bad)</span>",
+                fatigue: "Fatigue <br><span class='text-xs text-gray-500'>(10 Very Good - 1 Very Bad)</span>",
+                muscle: "Muscle Soreness <br><span class='text-xs text-gray-500'>(10 Very Good - 1 Very Bad)</span>",
+                stress: "Emotional Stress <br><span class='text-xs text-gray-500'>(10 Very Good - 1 Very Bad)</span>",
+                hydration: "Hydration <br><span class='text-xs text-gray-500'>(10 Very Hydrated - 1 Severely Dehydrated)</span>",
+                medicalStatus: "Medical Status",
+                menstrual: "Menstrual Symptoms:",
+                injury: "Do you have an injury today?",
+                illness: "Do you feel ill today?",
+                fit: "Are you fit to train today?",
+                submitMorning: "Submit Morning Readiness",
+                afterTraining: "After Training",
+                pitch: "RPE Pitch Training <br><span class='text-xs text-gray-500'>(10 Very Good - 1 Very Bad)</span>",
+                gym: "RPE Gym Training <br><span class='text-xs text-gray-500'>(10 Very Good - 1 Very Bad)</span>",
+                submitFinal: "Submit Final Daily Data",
+                yes: "Yes",
+                no: "No",
+                medStaff: "I need to speak to medical staff"
+            },
+            ny: { // ny stands for Nyanja / Chichewa
+                dailyWellness: "Umoyo wa Tsiku ndi Tsiku",
+                beforeTraining: "Musanayambe Maphunziro (Training)",
+                sleep: "Kagonekedwe (Sleep Quality) <br><span class='text-xs text-gray-500'>(10 Bwino Kwambiri - 1 Oipa Kwambiri)</span>",
+                fatigue: "Kutopa (Fatigue) <br><span class='text-xs text-gray-500'>(10 Bwino Kwambiri - 1 Oipa Kwambiri)</span>",
+                muscle: "Kupweteka kwa Minofu <br><span class='text-xs text-gray-500'>(10 Bwino Kwambiri - 1 Oipa Kwambiri)</span>",
+                stress: "Kupsinjika Maganizo (Stress) <br><span class='text-xs text-gray-500'>(10 Bwino Kwambiri - 1 Oipa Kwambiri)</span>",
+                hydration: "Madzi M'thupi (Hydration) <br><span class='text-xs text-gray-500'>(10 Madzi Okwanira - 1 Wopanda Madzi M'thupi)</span>",
+                medicalStatus: "Zokhudza Umoyo Wanu",
+                menstrual: "Zizindikiro Zakusamba:",
+                injury: "Kodi mwavulala lero?",
+                illness: "Kodi mukudwala lero?",
+                fit: "Kodi muli bwino kuti mupange zolimbitsa thupi lero?",
+                submitMorning: "Tumizani Zotsatira za M'mawa",
+                afterTraining: "Pambuyo pa Zolimbitsa Thupi",
+                pitch: "Mphamvu Yogwiritsa Ntchito pa Ground (RPE) <br><span class='text-xs text-gray-500'>(10 Bwino Kwambiri - 1 Oipa Kwambiri)</span>",
+                gym: "Mphamvu Yogwiritsa Ntchito mu Gym (RPE) <br><span class='text-xs text-gray-500'>(10 Bwino Kwambiri - 1 Oipa Kwambiri)</span>",
+                submitFinal: "Tumizani Zotsatira Zomaliza",
+                yes: "Inde",
+                no: "Ayi",
+                medStaff: "Ndikufuna kuonana ndi adokotala"
+            }
+        };
+
+        window.switchLanguage = function(lang) {
+            // Update all general text tags
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    element.innerHTML = translations[lang][key];
+                }
+            });
+
+            // Translate the specific options inside the select dropdowns dynamically
+            const fitStatusDropdown = document.getElementById('fitStatus');
+            if(fitStatusDropdown) {
+                fitStatusDropdown.options[0].text = translations[lang].yes;
+                fitStatusDropdown.options[1].text = translations[lang].no;
+                fitStatusDropdown.options[2].text = translations[lang].medStaff;
+            }
+
+            const yesNoDropdowns = ['injuryStatus', 'illnessStatus', 'menstruationStatus'];
+            yesNoDropdowns.forEach(id => {
+                const dropdown = document.getElementById(id);
+                if(dropdown) {
+                    dropdown.options[0].text = translations[lang].no;
+                    dropdown.options[1].text = translations[lang].yes;
+                }
+            });
+        };
         
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-    const errorMsg = document.getElementById('loginError');
-    const loginBtn = document.getElementById('loginBtn');
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorMsg = document.getElementById('loginError');
+            const loginBtn = document.getElementById('loginBtn');
 
-    // Reset UI state
-    errorMsg.classList.add('hidden');
-    loginBtn.innerText = "Logging in...";
-    loginBtn.disabled = true;
+            errorMsg.classList.add('hidden');
+            loginBtn.innerText = "Logging in...";
+            loginBtn.disabled = true;
 
-    try {
-        // 1. Authenticate the user with Firebase Auth
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        
-        // 2. Fetch their specific profile from the "users" collection
-        const userDoc = await getDoc(doc(db, "users", user.uid));
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                const userDoc = await getDoc(doc(db, "users", user.uid));
 
-        if (userDoc.exists()) {
-            const userData = userDoc.data();
-            currentUserId = user.uid;
-            currentUserName = userData.name;
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    currentUserId = user.uid;
+                    currentUserName = userData.name;
 
-            // Hide the login screen
-            document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('loginScreen').classList.add('hidden');
 
-            // 3. Route to the correct dashboard based on their role
-            if (userData.role === 'physio') {
-                document.getElementById('physioScreen').classList.remove('hidden');
-                window.loadPhysioDashboard();
-            } else if (userData.role === 'player') {
-                document.getElementById('playerScreen').classList.remove('hidden');
-                document.getElementById('playerWelcome').innerText = `${userData.name}'s Wellness`;
-            
-                // 1. Show/hide menstruation question based on gender
-                const mensQuestion = document.getElementById('menstruationQuestion');
-                if (userData.gender === 'female') {
-                    mensQuestion.classList.remove('hidden');
-                    mensQuestion.classList.add('block');
-                } else {
-                    mensQuestion.classList.add('hidden');
-                    mensQuestion.classList.remove('block');
-                }
-            
-                // 2. Hide both forms and any previous "done" messages to start fresh
-                document.getElementById('preTrainingForm').classList.add('hidden');
-                document.getElementById('postTrainingForm').classList.add('hidden');
-                const existingMsg = document.getElementById('allDoneMsg');
-                if (existingMsg) existingMsg.classList.add('hidden');
-            
-                // 3. Query the database: Does this user have a submission for TODAY?
-                const todayString = new Date().toISOString().split('T')[0];
-                const q = query(
-                    collection(db, "daily_submissions"),
-                    where("userId", "==", currentUserId),
-                    where("dateString", "==", todayString),
-                    limit(1)
-                );
-            
-                const snapshot = await getDocs(q);
-            
-                // 4. Route the player based on what we find
-                if (!snapshot.empty) {
-                    const todayDoc = snapshot.docs[0];
-                    currentSubmissionId = todayDoc.id; // Remember the ID for Part 2
-                    const data = todayDoc.data();
-            
-                    if (data.status === "part_1_complete") {
-                        // Part 1 is done. Unlock Part 2!
-                        document.getElementById('postTrainingForm').classList.remove('hidden');
-                    } else if (data.status === "fully_complete") {
-                        // Everything is done. Show a success message!
-                        if (!existingMsg) {
-                            document.querySelector('#playerScreen main').insertAdjacentHTML('afterbegin', 
-                                '<div id="allDoneMsg" class="bg-green-100 text-green-800 p-4 rounded-lg shadow text-center font-bold mb-6 border border-green-200">✅ You have completed all wellness logs for today! Enjoy your recovery.</div>'
-                            );
+                    if (userData.role === 'physio') {
+                        document.getElementById('physioScreen').classList.remove('hidden');
+                        window.loadPhysioDashboard();
+                    } else if (userData.role === 'player') {
+                        document.getElementById('playerScreen').classList.remove('hidden');
+                        document.getElementById('playerWelcome').innerText = `${userData.name}'s Wellness`;
+                    
+                        const mensQuestion = document.getElementById('menstruationQuestion');
+                        if (userData.gender === 'female') {
+                            mensQuestion.classList.remove('hidden');
+                            mensQuestion.classList.add('block');
                         } else {
-                            existingMsg.classList.remove('hidden');
+                            mensQuestion.classList.add('hidden');
+                            mensQuestion.classList.remove('block');
                         }
+                    
+                        document.getElementById('preTrainingForm').classList.add('hidden');
+                        document.getElementById('postTrainingForm').classList.add('hidden');
+                        const existingMsg = document.getElementById('allDoneMsg');
+                        if (existingMsg) existingMsg.classList.add('hidden');
+                    
+                        const todayString = new Date().toISOString().split('T')[0];
+                        const q = query(
+                            collection(db, "daily_submissions"),
+                            where("userId", "==", currentUserId),
+                            where("dateString", "==", todayString),
+                            limit(1)
+                        );
+                    
+                        const snapshot = await getDocs(q);
+                    
+                        if (!snapshot.empty) {
+                            const todayDoc = snapshot.docs[0];
+                            currentSubmissionId = todayDoc.id; 
+                            const data = todayDoc.data();
+                    
+                            if (data.status === "part_1_complete") {
+                                document.getElementById('postTrainingForm').classList.remove('hidden');
+                            } else if (data.status === "fully_complete") {
+                                if (!existingMsg) {
+                                    document.querySelector('#playerScreen main').insertAdjacentHTML('afterbegin', 
+                                        '<div id="allDoneMsg" class="bg-green-100 text-green-800 p-4 rounded-lg shadow text-center font-bold mb-6 border border-green-200">✅ You have completed all wellness logs for today! Enjoy your recovery.</div>'
+                                    );
+                                } else {
+                                    existingMsg.classList.remove('hidden');
+                                }
+                            }
+                        } else {
+                            document.getElementById('preTrainingForm').classList.remove('hidden');
+                            
+                            document.querySelectorAll('input[type="range"]').forEach(input => {
+                                input.value = 5;
+                                input.nextElementSibling.value = 5;
+                            });
+                        }
+                        
+                        // Reset language to English by default upon player login
+                        document.getElementById('languageSelect').value = 'en';
+                        window.switchLanguage('en');
                     }
                 } else {
-                    // No document found for today. Show Part 1.
-                    document.getElementById('preTrainingForm').classList.remove('hidden');
-                    
-                    // Reset sliders so they don't see yesterday's inputs
-                    document.querySelectorAll('input[type="range"]').forEach(input => {
-                        input.value = 5;
-                        input.nextElementSibling.value = 5;
-                    });
+                    throw new Error("Profile not found.");
                 }
-            }
-        } else {
-            throw new Error("Profile not found.");
-        }
 
-    } catch (error) {
-        console.error("Login Error:", error);
-        errorMsg.innerText = "Invalid email or password.";
-        errorMsg.classList.remove('hidden');
-    } finally {
-        loginBtn.innerText = "Log In";
-        loginBtn.disabled = false;
-    }
-});
+            } catch (error) {
+                console.error("Login Error:", error);
+                errorMsg.innerText = "Invalid email or password.";
+                errorMsg.classList.remove('hidden');
+            } finally {
+                loginBtn.innerText = "Log In";
+                loginBtn.disabled = false;
+            }
+        });
+
         window.submitPreTraining = async function(e) {
             e.preventDefault();
         
-            // Change the button text so the user knows it's saving
             const submitBtn = e.target.querySelector('button[type="submit"]');
             submitBtn.innerText = "Saving...";
             submitBtn.disabled = true;
         
-            // Gather all the data from the form
             const readinessData = {
                 timestamp: new Date().toISOString(),
-                dateString: new Date().toISOString().split('T')[0], // Adds "YYYY-MM-DD" format
-                userId: currentUserId,                              // Links to their Firebase Auth UID
+                dateString: new Date().toISOString().split('T')[0], 
+                userId: currentUserId,                              
                 playerId: currentUserName,
                 status: "part_1_complete",
                 metrics: {
@@ -364,19 +426,16 @@
                 }
             };
         
-            // Grab menstruation data only if the field was visible
             const mensQuestion = document.getElementById('menstruationQuestion');
             if (!mensQuestion.classList.contains('hidden')) {
                 readinessData.medical.menstruation = document.getElementById('menstruationStatus').value;
             }
         
             try {
-                // Send the data to a Firestore collection named "daily_submissions"
                 const docRef = await addDoc(collection(db, "daily_submissions"), readinessData);
                 currentSubmissionId = docRef.id;
                 console.log("Success! Document saved with ID: ", docRef.id);
                 
-                // Hide Part 1, Show Part 2
                 document.getElementById('preTrainingForm').classList.add('hidden');
                 document.getElementById('postTrainingForm').classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -385,8 +444,8 @@
                 console.error("Error adding document: ", error);
                 alert("Error saving data. Please check your connection and try again.");
             } finally {
-                // Reset the button
-                submitBtn.innerText = "Submit Morning Readiness";
+                const currentLang = document.getElementById('languageSelect').value;
+                submitBtn.innerHTML = translations[currentLang].submitMorning;
                 submitBtn.disabled = false;
             }
         }
@@ -394,7 +453,6 @@
         window.submitPostTraining = async function(e) {
             e.preventDefault();
         
-            // Ensure we have an ID from Part 1 to update
             if (!currentSubmissionId) {
                 alert("Error: No morning submission found to update.");
                 return;
@@ -404,9 +462,8 @@
             submitBtn.innerText = "Saving...";
             submitBtn.disabled = true;
         
-            // Gather Part 2 data and change the status
             const postTrainingData = {
-                status: "fully_complete", // This changes what shows on the dashboard
+                status: "fully_complete", 
                 rpe: {
                     pitch: parseInt(document.getElementById('pitchRpeScore').value),
                     gym: parseInt(document.getElementById('gymRpeScore').value)
@@ -414,7 +471,6 @@
             };
         
             try {
-                // Point to the specific document from this morning and update it
                 const documentReference = doc(db, "daily_submissions", currentSubmissionId);
                 await updateDoc(documentReference, postTrainingData);
                 
@@ -424,21 +480,20 @@
             } catch (error) {
                 console.error("Error updating document: ", error);
                 alert("Error saving data. Please check your connection and try again.");
-                submitBtn.innerText = "Submit Final Daily Data";
+                const currentLang = document.getElementById('languageSelect').value;
+                submitBtn.innerHTML = translations[currentLang].submitFinal;
                 submitBtn.disabled = false;
             }
         }
 
         window.logout = async function() {
             try {
-                await signOut(auth); // Tell Firebase to sign out
+                await signOut(auth); 
                 
-                // Clear variables
                 currentUserId = null;
                 currentUserName = "";
                 currentSubmissionId = null;
                 
-                // Reset the UI
                 document.getElementById('playerScreen').classList.add('hidden');
                 document.getElementById('physioScreen').classList.add('hidden');
                 document.getElementById('loginScreen').classList.remove('hidden');
@@ -454,30 +509,25 @@
             tableBody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-gray-500">Loading submissions...</td></tr>';
         
             try {
-                // Fetch all documents from the "daily_submissions" collection
-                // In a production app, you would add a filter here to only get today's date
                 const q = query(collection(db, "daily_submissions"), orderBy("timestamp", "desc"));
                 const querySnapshot = await getDocs(q);
         
-                tableBody.innerHTML = ''; // Clear the loading message
+                tableBody.innerHTML = ''; 
         
                 if (querySnapshot.empty) {
                     tableBody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-gray-500">No submissions yet today.</td></tr>';
                     return;
                 }
         
-                // Loop through each document in the database
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     
-                    // 1. Calculate the Readiness Score
                     let readinessScore = 0;
                     if (data.metrics) {
                         const total = data.metrics.sleep + data.metrics.fatigue + data.metrics.muscleSoreness + data.metrics.emotionalStress + data.metrics.hydration;
                         readinessScore = Math.round((total / 50) * 100);
                     }
         
-                    // 2. Check for Medical Flags to style the row
                     let isFlagged = false;
                     let medicalNote = "None";
                     
@@ -486,12 +536,10 @@
                         medicalNote = "Requested Staff";
                     }
         
-                    // 3. Set row colors based on the flag
                     const rowClass = isFlagged ? "border-b hover:bg-red-50 bg-red-50/50 transition-colors" : "border-b hover:bg-gray-50 transition-colors";
                     const scoreColor = isFlagged ? "text-red-600" : "text-gray-800";
                     const noteColor = isFlagged ? "font-bold text-red-600" : "text-gray-500";
         
-                    // 4. Create the HTML for the row and inject it
                     const tr = document.createElement('tr');
                     tr.className = rowClass;
                     tr.innerHTML = `
