@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Squad AMS - Full Questionnaire Demo</title>
+    <title>Physio with Ekari - Athlete Wellness App</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -11,7 +11,7 @@
     <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-            <h1 class="text-2xl font-bold text-center mb-6 text-blue-900">Squad AMS</h1>
+            <h1 class="text-2xl font-bold text-center mb-6 text-blue-900">Physio with Ekari - Athlete Wellness App</h1>
             <div class="space-y-4">
                 <button onclick="loginAs('malePlayer')" class="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700">Log In as Male Player</button>
                 <button onclick="loginAs('femalePlayer')" class="w-full bg-purple-600 text-white p-3 rounded font-bold hover:bg-purple-700">Log In as Female Player</button>
@@ -37,31 +37,31 @@
                 <div class="space-y-5">
                     <div>
                         <label class="block text-sm font-medium mb-1">Sleep Quality <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
-                        <input type="range" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
+                        <input type="range" id="sleepScore" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
                         <output class="text-blue-600 font-bold block text-center mt-1">5</output>
                     </div>
                     
                     <div>
                         <label class="block text-sm font-medium mb-1">Fatigue <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
-                        <input type="range" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
+                        <input type="range" id="fatigueScore" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
                         <output class="text-blue-600 font-bold block text-center mt-1">5</output>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium mb-1">Muscle Soreness <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
-                        <input type="range" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
+                        <input type="range" id="muscleScore" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
                         <output class="text-blue-600 font-bold block text-center mt-1">5</output>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium mb-1">Emotional Stress <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
-                        <input type="range" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
+                        <input type="range" id="stressScore" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
                         <output class="text-blue-600 font-bold block text-center mt-1">5</output>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium mb-1">Hydration <br><span class="text-xs text-gray-500">(10 Very Hydrated - 1 Severely Dehydrated)</span></label>
-                        <input type="range" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
+                        <input type="range" id="hydrationScore" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
                         <output class="text-blue-600 font-bold block text-center mt-1">5</output>
                     </div>
                 </div>
@@ -72,7 +72,7 @@
                     <!-- Conditionally Displayed Question -->
                     <div id="menstruationQuestion" class="hidden">
                         <label class="block text-sm font-medium mb-1 text-purple-800">Menstrual Symptoms:</label>
-                        <select class="w-full p-2 border rounded border-gray-300 bg-gray-50">
+                        <select id="menstruationStatus" class="w-full p-2 border rounded border-gray-300 bg-gray-50">
                             <option>No</option>
                             <option>Yes</option>
                         </select>
@@ -80,7 +80,7 @@
                     
                     <div>
                         <label class="block text-sm font-medium mb-1">Do you have an injury today?</label>
-                        <select class="w-full p-2 border rounded border-gray-300 bg-gray-50">
+                        <select id="injuryStatus" class="w-full p-2 border rounded border-gray-300 bg-gray-50">
                             <option>No</option>
                             <option>Yes</option>
                         </select>
@@ -88,7 +88,7 @@
 
                     <div>
                         <label class="block text-sm font-medium mb-1">Do you feel ill today?</label>
-                        <select class="w-full p-2 border rounded border-gray-300 bg-gray-50">
+                        <select id="illnessStatus" class="w-full p-2 border rounded border-gray-300 bg-gray-50">
                             <option>No</option>
                             <option>Yes</option>
                         </select>
@@ -96,7 +96,7 @@
 
                     <div class="pt-2">
                         <label class="block text-sm font-bold mb-1">Are you fit to train today?</label>
-                        <select class="w-full p-3 border-2 rounded border-blue-300 bg-blue-50 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <select id="fitStatus" class="w-full p-3 border-2 rounded border-blue-300 bg-blue-50 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option>Yes</option>
                             <option>No</option>
                             <option>I need to speak to medical staff</option>
@@ -118,13 +118,13 @@
                 <div class="space-y-5">
                     <div>
                         <label class="block text-sm font-medium mb-1">RPE Pitch Training <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
-                        <input type="range" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
+                        <input type="range" id="pitchRpeScore" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
                         <output class="text-blue-600 font-bold block text-center mt-1">5</output>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium mb-1">RPE Gym Training <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
-                        <input type="range" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
+                        <input type="range" id="gymRpeScore" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
                         <output class="text-blue-600 font-bold block text-center mt-1">5</output>
                     </div>
                 </div>
@@ -199,15 +199,15 @@
 
         // 2. PASTE YOUR CONFIG HERE
         // Replace this entire object with the one Firebase gave you
-const firebaseConfig = {
-  apiKey: "AIzaSyAY1NMcQum8Ts_9Oq4-ag0ozozwI5wz95A",
-  authDomain: "ekariams.firebaseapp.com",
-  projectId: "ekariams",
-  storageBucket: "ekariams.firebasestorage.app",
-  messagingSenderId: "968465910110",
-  appId: "1:968465910110:web:09368e7cfd56387953a7cf",
-  measurementId: "G-GZVLJQCQZJ"
-};
+        const firebaseConfig = {
+        apiKey: "AIzaSyAY1NMcQum8Ts_9Oq4-ag0ozozwI5wz95A",
+        authDomain: "ekariams.firebaseapp.com",
+        projectId: "ekariams",
+        storageBucket: "ekariams.firebasestorage.app",
+        messagingSenderId: "968465910110",
+        appId: "1:968465910110:web:09368e7cfd56387953a7cf",
+        measurementId: "G-GZVLJQCQZJ"
+        };
 
         // 3. Start up Firebase
         const app = initializeApp(firebaseConfig);
@@ -249,16 +249,62 @@ const firebaseConfig = {
             }
         }
 
-        window.submitPreTraining = function(e) {
+        window.submitPreTraining = async function(e) {
             e.preventDefault();
-            document.getElementById('preTrainingForm').classList.add('hidden');
-            document.getElementById('postTrainingForm').classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+            // Change the button text so the user knows it's saving
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.innerText = "Saving...";
+            submitBtn.disabled = true;
+        
+            // Gather all the data from the form
+            const readinessData = {
+                timestamp: new Date().toISOString(),
+                playerId: "demo-player-123", // Hardcoded until user authentication is built
+                status: "part_1_complete",
+                metrics: {
+                    sleep: parseInt(document.getElementById('sleepScore').value),
+                    fatigue: parseInt(document.getElementById('fatigueScore').value),
+                    muscleSoreness: parseInt(document.getElementById('muscleScore').value),
+                    emotionalStress: parseInt(document.getElementById('stressScore').value),
+                    hydration: parseInt(document.getElementById('hydrationScore').value)
+                },
+                medical: {
+                    injury: document.getElementById('injuryStatus').value,
+                    illness: document.getElementById('illnessStatus').value,
+                    fitToTrain: document.getElementById('fitStatus').value
+                }
+            };
+        
+            // Grab menstruation data only if the field was visible
+            const mensQuestion = document.getElementById('menstruationQuestion');
+            if (!mensQuestion.classList.contains('hidden')) {
+                readinessData.medical.menstruation = document.getElementById('menstruationStatus').value;
+            }
+        
+            try {
+                // Send the data to a Firestore collection named "daily_submissions"
+                const docRef = await addDoc(collection(db, "daily_submissions"), readinessData);
+                console.log("Success! Document saved with ID: ", docRef.id);
+                
+                // Hide Part 1, Show Part 2
+                document.getElementById('preTrainingForm').classList.add('hidden');
+                document.getElementById('postTrainingForm').classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                alert("Error saving data. Please check your connection and try again.");
+            } finally {
+                // Reset the button
+                submitBtn.innerText = "Submit Morning Readiness";
+                submitBtn.disabled = false;
+            }
         }
 
         window.submitPostTraining = function(e) {
             e.preventDefault();
-            alert("Data ready to send to Firebase!");
+            alert("Data ready to send to Firebase! (This will be updated next)");
             window.logout();
         }
 
@@ -268,7 +314,5 @@ const firebaseConfig = {
             document.getElementById('loginScreen').classList.remove('hidden');
         }
     </script>
-</body>
-</html>
 </body>
 </html>
