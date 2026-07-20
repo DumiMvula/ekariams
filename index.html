@@ -170,19 +170,10 @@
                             <th class="p-3 border-b">Medical Note</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr class="border-b hover:bg-gray-50 transition-colors">
-                            <td class="p-3 font-bold text-gray-800">Mark (Male)</td>
-                            <td class="p-3"><span class="bg-gray-200 text-gray-800 px-2 py-1 rounded text-xs font-medium">Waiting for Part 2</span></td>
-                            <td class="p-3 font-medium">85%</td>
-                            <td class="p-3 text-gray-500">None</td>
-                        </tr>
-                        <!-- Highlighted row for low score / medical flag -->
-                        <tr class="border-b hover:bg-red-50 bg-red-50/50 transition-colors">
-                            <td class="p-3 font-bold text-gray-800">Sarah (Female)</td>
-                            <td class="p-3"><span class="bg-green-200 text-green-800 px-2 py-1 rounded text-xs font-medium">Fully Completed</span></td>
-                            <td class="p-3 font-bold text-red-600">32%</td>
-                            <td class="p-3 font-bold text-red-600">Requested Staff</td>
+                    <!-- Update the table body in the Physio Dashboard -->
+                    <tbody id="physioTableBody">
+                        <tr>
+                            <td colspan="4" class="p-3 text-center text-gray-500">Loading submissions...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -195,7 +186,7 @@
         // 1. Import the Firebase tools directly from Google's servers
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         // 2. PASTE YOUR CONFIG HERE
         // Replace this entire object with the one Firebase gave you
@@ -225,6 +216,7 @@
             
             if (role === 'physio') {
                 document.getElementById('physioScreen').classList.remove('hidden');
+                window.loadPhysioDashboard();
             } else {
                 document.getElementById('playerScreen').classList.remove('hidden');
                 
@@ -312,6 +304,67 @@
             document.getElementById('playerScreen').classList.add('hidden');
             document.getElementById('physioScreen').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        window.loadPhysioDashboard = async function() {
+            const tableBody = document.getElementById('physioTableBody');
+            tableBody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-gray-500">Loading submissions...</td></tr>';
+        
+            try {
+                // Fetch all documents from the "daily_submissions" collection
+                // In a production app, you would add a filter here to only get today's date
+                const q = query(collection(db, "daily_submissions"), orderBy("timestamp", "desc"));
+                const querySnapshot = await getDocs(q);
+        
+                tableBody.innerHTML = ''; // Clear the loading message
+        
+                if (querySnapshot.empty) {
+                    tableBody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-gray-500">No submissions yet today.</td></tr>';
+                    return;
+                }
+        
+                // Loop through each document in the database
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    
+                    // 1. Calculate the Readiness Score
+                    let readinessScore = 0;
+                    if (data.metrics) {
+                        const total = data.metrics.sleep + data.metrics.fatigue + data.metrics.muscleSoreness + data.metrics.emotionalStress + data.metrics.hydration;
+                        readinessScore = Math.round((total / 50) * 100);
+                    }
+        
+                    // 2. Check for Medical Flags to style the row
+                    let isFlagged = false;
+                    let medicalNote = "None";
+                    
+                    if (data.medical && data.medical.fitToTrain === "I need to speak to medical staff") {
+                        isFlagged = true;
+                        medicalNote = "Requested Staff";
+                    }
+        
+                    // 3. Set row colors based on the flag
+                    const rowClass = isFlagged ? "border-b hover:bg-red-50 bg-red-50/50 transition-colors" : "border-b hover:bg-gray-50 transition-colors";
+                    const scoreColor = isFlagged ? "text-red-600" : "text-gray-800";
+                    const noteColor = isFlagged ? "font-bold text-red-600" : "text-gray-500";
+        
+                    // 4. Create the HTML for the row and inject it
+                    const tr = document.createElement('tr');
+                    tr.className = rowClass;
+                    tr.innerHTML = `
+                        <td class="p-3 font-bold text-gray-800">${data.playerId}</td>
+                        <td class="p-3"><span class="bg-gray-200 text-gray-800 px-2 py-1 rounded text-xs font-medium">${data.status.replace(/_/g, ' ')}</span></td>
+                        <td class="p-3 font-bold ${scoreColor}">${readinessScore}%</td>
+                        <td class="p-3 ${noteColor}">${medicalNote}</td>
+                    `;
+                    
+                    tableBody.appendChild(tr);
+                });
+        
+            } catch (error) {
+                console.error("Error fetching data: ", error);
+                tableBody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-red-500">Error loading data. Check console.</td></tr>';
+            }
         }
     </script>
 </body>
