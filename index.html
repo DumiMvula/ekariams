@@ -190,8 +190,37 @@
         </main>
     </div>
 
-    <script>
-        function loginAs(role) {
+    <!-- Add type="module" to allow importing Firebase tools -->
+    <script type="module">
+        // 1. Import the Firebase tools directly from Google's servers
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        // 2. PASTE YOUR CONFIG HERE
+        // Replace this entire object with the one Firebase gave you
+const firebaseConfig = {
+  apiKey: "AIzaSyAY1NMcQum8Ts_9Oq4-ag0ozozwI5wz95A",
+  authDomain: "ekariams.firebaseapp.com",
+  projectId: "ekariams",
+  storageBucket: "ekariams.firebasestorage.app",
+  messagingSenderId: "968465910110",
+  appId: "1:968465910110:web:09368e7cfd56387953a7cf",
+  measurementId: "G-GZVLJQCQZJ"
+};
+
+        // 3. Start up Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        console.log("Firebase is connected successfully!");
+
+        // 4. Our UI Logic 
+        // Because we are using a "module" script, we have to attach our functions 
+        // to the 'window' object so the HTML buttons can still find them.
+        
+        window.loginAs = function(role) {
             document.getElementById('loginScreen').classList.add('hidden');
             
             if (role === 'physio') {
@@ -199,17 +228,14 @@
             } else {
                 document.getElementById('playerScreen').classList.remove('hidden');
                 
-                // Reset form state to Part 1
                 document.getElementById('preTrainingForm').classList.remove('hidden');
                 document.getElementById('postTrainingForm').classList.add('hidden');
                 
-                // Reset all range inputs to 5
                 document.querySelectorAll('input[type="range"]').forEach(input => {
                     input.value = 5;
                     input.nextElementSibling.value = 5;
                 });
                 
-                // Conditional Logic: Show Menstruation question only for female profile
                 const mensQuestion = document.getElementById('menstruationQuestion');
                 if (role === 'femalePlayer') {
                     mensQuestion.classList.remove('hidden');
@@ -223,25 +249,26 @@
             }
         }
 
-        function submitPreTraining(e) {
+        window.submitPreTraining = function(e) {
             e.preventDefault();
-            // Hide Part 1, Show Part 2
             document.getElementById('preTrainingForm').classList.add('hidden');
             document.getElementById('postTrainingForm').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function submitPostTraining(e) {
+        window.submitPostTraining = function(e) {
             e.preventDefault();
-            alert("Daily logs completely submitted!");
-            logout();
+            alert("Data ready to send to Firebase!");
+            window.logout();
         }
 
-        function logout() {
+        window.logout = function() {
             document.getElementById('playerScreen').classList.add('hidden');
             document.getElementById('physioScreen').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
         }
     </script>
+</body>
+</html>
 </body>
 </html>
