@@ -186,7 +186,7 @@
         // 1. Import the Firebase tools directly from Google's servers
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         // 2. PASTE YOUR CONFIG HERE
         // Replace this entire object with the one Firebase gave you
@@ -206,6 +206,8 @@
         const db = getFirestore(app);
         
         console.log("Firebase is connected successfully!");
+
+        let currentSubmissionId = null;
 
         // 4. Our UI Logic 
         // Because we are using a "module" script, we have to attach our functions 
@@ -277,6 +279,7 @@
             try {
                 // Send the data to a Firestore collection named "daily_submissions"
                 const docRef = await addDoc(collection(db, "daily_submissions"), readinessData);
+                currentSubmissionId = docRef.id;
                 console.log("Success! Document saved with ID: ", docRef.id);
                 
                 // Hide Part 1, Show Part 2
@@ -294,10 +297,42 @@
             }
         }
 
-        window.submitPostTraining = function(e) {
+        window.submitPostTraining = async function(e) {
             e.preventDefault();
-            alert("Data ready to send to Firebase! (This will be updated next)");
-            window.logout();
+        
+            // Ensure we have an ID from Part 1 to update
+            if (!currentSubmissionId) {
+                alert("Error: No morning submission found to update.");
+                return;
+            }
+        
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.innerText = "Saving...";
+            submitBtn.disabled = true;
+        
+            // Gather Part 2 data and change the status
+            const postTrainingData = {
+                status: "fully_complete", // This changes what shows on the dashboard
+                rpe: {
+                    pitch: parseInt(document.getElementById('pitchRpeScore').value),
+                    gym: parseInt(document.getElementById('gymRpeScore').value)
+                }
+            };
+        
+            try {
+                // Point to the specific document from this morning and update it
+                const documentReference = doc(db, "daily_submissions", currentSubmissionId);
+                await updateDoc(documentReference, postTrainingData);
+                
+                alert("Daily logs completely submitted!");
+                window.logout();
+                
+            } catch (error) {
+                console.error("Error updating document: ", error);
+                alert("Error saving data. Please check your connection and try again.");
+                submitBtn.innerText = "Submit Final Daily Data";
+                submitBtn.disabled = false;
+            }
         }
 
         window.logout = function() {
