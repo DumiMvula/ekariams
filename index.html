@@ -12,13 +12,25 @@
     <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-            <img src="logo.png" alt="App Logo" class="w-24 h-24 mx-auto mb-4 object-contain">
-            <h1 class="text-2xl font-bold text-center mb-6 text-blue-900">Physio with Ekari - Athlete Wellness App</h1>
-            <div class="space-y-4">
-                <button onclick="loginAs('malePlayer')" class="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700">Log In as Male Player</button>
-                <button onclick="loginAs('femalePlayer')" class="w-full bg-purple-600 text-white p-3 rounded font-bold hover:bg-purple-700">Log In as Female Player</button>
-                <button onclick="loginAs('physio')" class="w-full bg-indigo-900 text-white p-3 rounded font-bold hover:bg-indigo-800 mt-4">Log In as Physio</button>
-            </div>
+            <img src="logo.jpg" alt="App Logo" class="w-24 h-24 mx-auto mb-4 object-contain">
+            <h1 class="text-2xl font-bold text-center mb-6 text-blue-900">Squad AMS</h1>
+            
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-700">Email Address</label>
+                    <input type="email" id="loginEmail" required class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-700">Password</label>
+                    <input type="password" id="loginPassword" required class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50">
+                </div>
+                
+                <p id="loginError" class="text-red-500 text-sm hidden font-medium text-center"></p>
+                
+                <button type="submit" id="loginBtn" class="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700 mt-4 shadow transition-colors">
+                    Log In
+                </button>
+            </form>
         </div>
     </div>
 
@@ -187,9 +199,8 @@
     <script type="module">
         // 1. Import the Firebase tools directly from Google's servers
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, query, orderBy, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
+        import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         // 2. PASTE YOUR CONFIG HERE
         // Replace this entire object with the one Firebase gave you
         const firebaseConfig = {
@@ -210,41 +221,83 @@
         console.log("Firebase is connected successfully!");
 
         let currentSubmissionId = null;
+        let currentUserId = null;
+        let currentUserName = "";
 
         // 4. Our UI Logic 
         // Because we are using a "module" script, we have to attach our functions 
         // to the 'window' object so the HTML buttons can still find them.
         
-        window.loginAs = function(role) {
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    const errorMsg = document.getElementById('loginError');
+    const loginBtn = document.getElementById('loginBtn');
+
+    // Reset UI state
+    errorMsg.classList.add('hidden');
+    loginBtn.innerText = "Logging in...";
+    loginBtn.disabled = true;
+
+    try {
+        // 1. Authenticate the user with Firebase Auth
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        
+        // 2. Fetch their specific profile from the "users" collection
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            currentUserId = user.uid;
+            currentUserName = userData.name;
+
+            // Hide the login screen
             document.getElementById('loginScreen').classList.add('hidden');
-            
-            if (role === 'physio') {
+
+            // 3. Route to the correct dashboard based on their role
+            if (userData.role === 'physio') {
                 document.getElementById('physioScreen').classList.remove('hidden');
                 window.loadPhysioDashboard();
-            } else {
+            } else if (userData.role === 'player') {
                 document.getElementById('playerScreen').classList.remove('hidden');
-                
                 document.getElementById('preTrainingForm').classList.remove('hidden');
                 document.getElementById('postTrainingForm').classList.add('hidden');
                 
+                // Personalize the dashboard
+                document.getElementById('playerWelcome').innerText = `${userData.name}'s Wellness`;
+
+                // Show/hide menstruation question based on gender
+                const mensQuestion = document.getElementById('menstruationQuestion');
+                if (userData.gender === 'female') {
+                    mensQuestion.classList.remove('hidden');
+                    mensQuestion.classList.add('block');
+                } else {
+                    mensQuestion.classList.add('hidden');
+                    mensQuestion.classList.remove('block');
+                }
+
+                // Reset sliders to default
                 document.querySelectorAll('input[type="range"]').forEach(input => {
                     input.value = 5;
                     input.nextElementSibling.value = 5;
                 });
-                
-                const mensQuestion = document.getElementById('menstruationQuestion');
-                if (role === 'femalePlayer') {
-                    mensQuestion.classList.remove('hidden');
-                    mensQuestion.classList.add('block');
-                    document.getElementById('playerWelcome').innerText = "Sarah's Wellness";
-                } else {
-                    mensQuestion.classList.add('hidden');
-                    mensQuestion.classList.remove('block');
-                    document.getElementById('playerWelcome').innerText = "Mark's Wellness";
-                }
             }
+        } else {
+            throw new Error("Profile not found.");
         }
 
+    } catch (error) {
+        console.error("Login Error:", error);
+        errorMsg.innerText = "Invalid email or password.";
+        errorMsg.classList.remove('hidden');
+    } finally {
+        loginBtn.innerText = "Log In";
+        loginBtn.disabled = false;
+    }
+});
         window.submitPreTraining = async function(e) {
             e.preventDefault();
         
@@ -256,7 +309,7 @@
             // Gather all the data from the form
             const readinessData = {
                 timestamp: new Date().toISOString(),
-                playerId: "demo-player-123", // Hardcoded until user authentication is built
+                playerId: currentUserName,
                 status: "part_1_complete",
                 metrics: {
                     sleep: parseInt(document.getElementById('sleepScore').value),
@@ -337,10 +390,24 @@
             }
         }
 
-        window.logout = function() {
-            document.getElementById('playerScreen').classList.add('hidden');
-            document.getElementById('physioScreen').classList.add('hidden');
-            document.getElementById('loginScreen').classList.remove('hidden');
+        window.logout = async function() {
+            try {
+                await signOut(auth); // Tell Firebase to sign out
+                
+                // Clear variables
+                currentUserId = null;
+                currentUserName = "";
+                currentSubmissionId = null;
+                
+                // Reset the UI
+                document.getElementById('playerScreen').classList.add('hidden');
+                document.getElementById('physioScreen').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('loginForm').reset();
+                
+            } catch (error) {
+                console.error("Error signing out:", error);
+            }
         }
 
         window.loadPhysioDashboard = async function() {
