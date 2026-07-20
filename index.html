@@ -200,7 +200,7 @@
         // 1. Import the Firebase tools directly from Google's servers
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, query, orderBy, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, doc, updateDoc, getDoc, where, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         // 2. PASTE YOUR CONFIG HERE
         // Replace this entire object with the one Firebase gave you
         const firebaseConfig = {
@@ -263,13 +263,9 @@
                 window.loadPhysioDashboard();
             } else if (userData.role === 'player') {
                 document.getElementById('playerScreen').classList.remove('hidden');
-                document.getElementById('preTrainingForm').classList.remove('hidden');
-                document.getElementById('postTrainingForm').classList.add('hidden');
-                
-                // Personalize the dashboard
                 document.getElementById('playerWelcome').innerText = `${userData.name}'s Wellness`;
-
-                // Show/hide menstruation question based on gender
+            
+                // 1. Show/hide menstruation question based on gender
                 const mensQuestion = document.getElementById('menstruationQuestion');
                 if (userData.gender === 'female') {
                     mensQuestion.classList.remove('hidden');
@@ -278,12 +274,53 @@
                     mensQuestion.classList.add('hidden');
                     mensQuestion.classList.remove('block');
                 }
-
-                // Reset sliders to default
-                document.querySelectorAll('input[type="range"]').forEach(input => {
-                    input.value = 5;
-                    input.nextElementSibling.value = 5;
-                });
+            
+                // 2. Hide both forms and any previous "done" messages to start fresh
+                document.getElementById('preTrainingForm').classList.add('hidden');
+                document.getElementById('postTrainingForm').classList.add('hidden');
+                const existingMsg = document.getElementById('allDoneMsg');
+                if (existingMsg) existingMsg.classList.add('hidden');
+            
+                // 3. Query the database: Does this user have a submission for TODAY?
+                const todayString = new Date().toISOString().split('T')[0];
+                const q = query(
+                    collection(db, "daily_submissions"),
+                    where("userId", "==", currentUserId),
+                    where("dateString", "==", todayString),
+                    limit(1)
+                );
+            
+                const snapshot = await getDocs(q);
+            
+                // 4. Route the player based on what we find
+                if (!snapshot.empty) {
+                    const todayDoc = snapshot.docs[0];
+                    currentSubmissionId = todayDoc.id; // Remember the ID for Part 2
+                    const data = todayDoc.data();
+            
+                    if (data.status === "part_1_complete") {
+                        // Part 1 is done. Unlock Part 2!
+                        document.getElementById('postTrainingForm').classList.remove('hidden');
+                    } else if (data.status === "fully_complete") {
+                        // Everything is done. Show a success message!
+                        if (!existingMsg) {
+                            document.querySelector('#playerScreen main').insertAdjacentHTML('afterbegin', 
+                                '<div id="allDoneMsg" class="bg-green-100 text-green-800 p-4 rounded-lg shadow text-center font-bold mb-6 border border-green-200">✅ You have completed all wellness logs for today! Enjoy your recovery.</div>'
+                            );
+                        } else {
+                            existingMsg.classList.remove('hidden');
+                        }
+                    }
+                } else {
+                    // No document found for today. Show Part 1.
+                    document.getElementById('preTrainingForm').classList.remove('hidden');
+                    
+                    // Reset sliders so they don't see yesterday's inputs
+                    document.querySelectorAll('input[type="range"]').forEach(input => {
+                        input.value = 5;
+                        input.nextElementSibling.value = 5;
+                    });
+                }
             }
         } else {
             throw new Error("Profile not found.");
@@ -309,6 +346,8 @@
             // Gather all the data from the form
             const readinessData = {
                 timestamp: new Date().toISOString(),
+                dateString: new Date().toISOString().split('T')[0], // Adds "YYYY-MM-DD" format
+                userId: currentUserId,                              // Links to their Firebase Auth UID
                 playerId: currentUserName,
                 status: "part_1_complete",
                 metrics: {
