@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squad AMS - Full Questionnaire Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+            <h1 class="text-2xl font-bold text-center mb-6 text-blue-900">Squad AMS</h1>
+            <div class="space-y-4">
+                <button onclick="loginAs('malePlayer')" class="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700">Log In as Male Player</button>
+                <button onclick="loginAs('femalePlayer')" class="w-full bg-purple-600 text-white p-3 rounded font-bold hover:bg-purple-700">Log In as Female Player</button>
+                <button onclick="loginAs('physio')" class="w-full bg-indigo-900 text-white p-3 rounded font-bold hover:bg-indigo-800 mt-4">Log In as Physio</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PLAYER DASHBOARD -->
+    <div id="playerScreen" class="hidden min-h-screen pb-20">
+        <header class="bg-blue-900 text-white p-4 shadow-md sticky top-0 z-10 flex justify-between items-center">
+            <h1 class="text-xl font-bold" id="playerWelcome">Daily Wellness</h1>
+            <button onclick="logout()" class="text-sm bg-red-500 px-3 py-1 rounded">Logout</button>
+        </header>
+
+        <main class="p-4 max-w-md mx-auto space-y-6">
+            
+            <!-- PART 1: BEFORE TRAINING -->
+            <form id="preTrainingForm" class="bg-white p-6 rounded-lg shadow-md space-y-6" onsubmit="submitPreTraining(event)">
+                <h2 class="text-xl font-bold border-b pb-2 text-blue-900">Before Training</h2>
+                
+                <!-- Wellness Sliders -->
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Sleep Quality <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
+                        <input type="range" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
+                        <output class="text-blue-600 font-bold block text-center mt-1">5</output>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Fatigue <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
+                        <input type="range" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
+                        <output class="text-blue-600 font-bold block text-center mt-1">5</output>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Muscle Soreness <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
+                        <input type="range" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
+                        <output class="text-blue-600 font-bold block text-center mt-1">5</output>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Emotional Stress <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
+                        <input type="range" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
+                        <output class="text-blue-600 font-bold block text-center mt-1">5</output>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Hydration <br><span class="text-xs text-gray-500">(10 Very Hydrated - 1 Severely Dehydrated)</span></label>
+                        <input type="range" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
+                        <output class="text-blue-600 font-bold block text-center mt-1">5</output>
+                    </div>
+                </div>
+
+                <h2 class="text-lg font-bold border-b pb-2 mt-8 text-blue-900">Medical Status</h2>
+
+                <div class="space-y-4">
+                    <!-- Conditionally Displayed Question -->
+                    <div id="menstruationQuestion" class="hidden">
+                        <label class="block text-sm font-medium mb-1 text-purple-800">Menstrual Symptoms:</label>
+                        <select class="w-full p-2 border rounded border-gray-300 bg-gray-50">
+                            <option>No</option>
+                            <option>Yes</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Do you have an injury today?</label>
+                        <select class="w-full p-2 border rounded border-gray-300 bg-gray-50">
+                            <option>No</option>
+                            <option>Yes</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Do you feel ill today?</label>
+                        <select class="w-full p-2 border rounded border-gray-300 bg-gray-50">
+                            <option>No</option>
+                            <option>Yes</option>
+                        </select>
+                    </div>
+
+                    <div class="pt-2">
+                        <label class="block text-sm font-bold mb-1">Are you fit to train today?</label>
+                        <select class="w-full p-3 border-2 rounded border-blue-300 bg-blue-50 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option>Yes</option>
+                            <option>No</option>
+                            <option>I need to speak to medical staff</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 text-white p-4 rounded font-bold hover:bg-blue-700 mt-6 shadow-md transition-colors">Submit Morning Readiness</button>
+            </form>
+
+            <!-- PART 2: AFTER TRAINING (Hidden initially) -->
+            <form id="postTrainingForm" class="hidden bg-white p-6 rounded-lg shadow-md space-y-6" onsubmit="submitPostTraining(event)">
+                <div class="bg-green-100 text-green-800 p-3 rounded text-sm mb-4 border border-green-200">
+                    ✅ Morning readiness recorded. 
+                </div>
+                
+                <h2 class="text-xl font-bold border-b pb-2 text-blue-900">After Training</h2>
+                
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">RPE Pitch Training <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
+                        <input type="range" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
+                        <output class="text-blue-600 font-bold block text-center mt-1">5</output>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">RPE Gym Training <br><span class="text-xs text-gray-500">(10 Very Good - 1 Very Bad)</span></label>
+                        <input type="range" min="1" max="10" value="5" class="w-full" oninput="this.nextElementSibling.value = this.value">
+                        <output class="text-blue-600 font-bold block text-center mt-1">5</output>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-green-600 text-white p-4 rounded font-bold hover:bg-green-700 mt-6 shadow-md transition-colors">Submit Final Daily Data</button>
+            </form>
+        </main>
+    </div>
+
+    <!-- PHYSIO DASHBOARD -->
+    <div id="physioScreen" class="hidden min-h-screen">
+        <header class="bg-indigo-900 text-white p-4 shadow-md sticky top-0 z-10 flex justify-between items-center">
+            <h1 class="text-xl font-bold">Medical Admin</h1>
+            <button onclick="logout()" class="text-sm bg-red-500 px-3 py-1 rounded">Logout</button>
+        </header>
+
+        <main class="p-4 max-w-5xl mx-auto space-y-6">
+            
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                <h2 class="text-2xl font-bold text-gray-800">Today's Overview</h2>
+                <button class="bg-indigo-600 text-white px-4 py-2 rounded text-sm font-medium shadow hover:bg-indigo-700">+ Invite Player</button>
+            </div>
+
+            <!-- UI Highlight for Medical Attention -->
+            <div class="bg-red-50 border-l-4 border-red-600 p-4 mb-6 rounded shadow-sm">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-red-600 font-bold text-lg">⚠️ Action Required</span>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-red-700 font-medium">1 player requested to speak with medical staff today.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded shadow overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[600px]">
+                    <thead>
+                        <tr class="bg-gray-100 text-sm uppercase text-gray-600">
+                            <th class="p-3 border-b">Player</th>
+                            <th class="p-3 border-b">Status</th>
+                            <th class="p-3 border-b">Readiness Score</th>
+                            <th class="p-3 border-b">Medical Note</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b hover:bg-gray-50 transition-colors">
+                            <td class="p-3 font-bold text-gray-800">Mark (Male)</td>
+                            <td class="p-3"><span class="bg-gray-200 text-gray-800 px-2 py-1 rounded text-xs font-medium">Waiting for Part 2</span></td>
+                            <td class="p-3 font-medium">85%</td>
+                            <td class="p-3 text-gray-500">None</td>
+                        </tr>
+                        <!-- Highlighted row for low score / medical flag -->
+                        <tr class="border-b hover:bg-red-50 bg-red-50/50 transition-colors">
+                            <td class="p-3 font-bold text-gray-800">Sarah (Female)</td>
+                            <td class="p-3"><span class="bg-green-200 text-green-800 px-2 py-1 rounded text-xs font-medium">Fully Completed</span></td>
+                            <td class="p-3 font-bold text-red-600">32%</td>
+                            <td class="p-3 font-bold text-red-600">Requested Staff</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function loginAs(role) {
+            document.getElementById('loginScreen').classList.add('hidden');
+            
+            if (role === 'physio') {
+                document.getElementById('physioScreen').classList.remove('hidden');
+            } else {
+                document.getElementById('playerScreen').classList.remove('hidden');
+                
+                // Reset form state to Part 1
+                document.getElementById('preTrainingForm').classList.remove('hidden');
+                document.getElementById('postTrainingForm').classList.add('hidden');
+                
+                // Reset all range inputs to 5
+                document.querySelectorAll('input[type="range"]').forEach(input => {
+                    input.value = 5;
+                    input.nextElementSibling.value = 5;
+                });
+                
+                // Conditional Logic: Show Menstruation question only for female profile
+                const mensQuestion = document.getElementById('menstruationQuestion');
+                if (role === 'femalePlayer') {
+                    mensQuestion.classList.remove('hidden');
+                    mensQuestion.classList.add('block');
+                    document.getElementById('playerWelcome').innerText = "Sarah's Wellness";
+                } else {
+                    mensQuestion.classList.add('hidden');
+                    mensQuestion.classList.remove('block');
+                    document.getElementById('playerWelcome').innerText = "Mark's Wellness";
+                }
+            }
+        }
+
+        function submitPreTraining(e) {
+            e.preventDefault();
+            // Hide Part 1, Show Part 2
+            document.getElementById('preTrainingForm').classList.add('hidden');
+            document.getElementById('postTrainingForm').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function submitPostTraining(e) {
+            e.preventDefault();
+            alert("Daily logs completely submitted!");
+            logout();
+        }
+
+        function logout() {
+            document.getElementById('playerScreen').classList.add('hidden');
+            document.getElementById('physioScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
