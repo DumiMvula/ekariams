@@ -17,8 +17,9 @@
             
             <form id="loginForm" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium mb-1 text-gray-700">Email Address</label>
-                    <input type="email" id="loginEmail" required class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50">
+                    <!-- Changed from Email to Username -->
+                    <label class="block text-sm font-medium mb-1 text-gray-700">Username</label>
+                    <input type="text" id="loginUsername" required class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50">
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1 text-gray-700">Password</label>
@@ -49,6 +50,11 @@
 
         <main class="p-4 max-w-md mx-auto space-y-6">
             
+            <!-- NEW: Morning Complete Message (Shown after submitting Part 1) -->
+            <div id="morningCompleteMsg" class="hidden bg-blue-100 text-blue-800 p-4 rounded-lg shadow text-center font-bold mb-6 border border-blue-200" data-i18n="morningCompleteMsg">
+                ✅ Morning readiness recorded. Please log out and return after training to complete Part 2.
+            </div>
+
             <!-- PART 1: BEFORE TRAINING -->
             <form id="preTrainingForm" class="bg-white p-6 rounded-lg shadow-md space-y-6" onsubmit="submitPreTraining(event)">
                 <h2 class="text-xl font-bold border-b pb-2 text-blue-900" data-i18n="beforeTraining">Before Training</h2>
@@ -225,7 +231,7 @@
         let currentUserId = null;
         let currentUserName = "";
 
-        // The Translation Dictionary
+        // The Translation Dictionary (Added morningCompleteMsg)
         const translations = {
             en: {
                 dailyWellness: "Daily Wellness",
@@ -241,6 +247,7 @@
                 illness: "Do you feel ill today?",
                 fit: "Are you fit to train today?",
                 submitMorning: "Submit Morning Readiness",
+                morningCompleteMsg: "✅ Morning readiness recorded. Please log out and return after training to complete Part 2.",
                 afterTraining: "After Training",
                 pitch: "RPE Pitch Training <br><span class='text-xs text-gray-500'>(10 Very Good - 1 Very Bad)</span>",
                 gym: "RPE Gym Training <br><span class='text-xs text-gray-500'>(10 Very Good - 1 Very Bad)</span>",
@@ -263,6 +270,7 @@
                 illness: "Kodi mukudwala lero?",
                 fit: "Kodi muli bwino kuti mupange zolimbitsa thupi lero?",
                 submitMorning: "Tumizani Zotsatira za M'mawa",
+                morningCompleteMsg: "✅ Zotsatira za m'mawa zasungidwa. Chonde tulukani (logout) ndikubweranso pambuyo pa maphunziro kuti mumalize gawo lachiwiri.",
                 afterTraining: "Pambuyo pa Zolimbitsa Thupi",
                 pitch: "Mphamvu Yogwiritsa Ntchito pa Ground (RPE) <br><span class='text-xs text-gray-500'>(10 Bwino Kwambiri - 1 Oipa Kwambiri)</span>",
                 gym: "Mphamvu Yogwiritsa Ntchito mu Gym (RPE) <br><span class='text-xs text-gray-500'>(10 Bwino Kwambiri - 1 Oipa Kwambiri)</span>",
@@ -274,6 +282,9 @@
         };
 
         window.switchLanguage = function(lang) {
+            // Save language preference to the browser
+            localStorage.setItem('preferredLanguage', lang);
+
             // Update all general text tags
             document.querySelectorAll('[data-i18n]').forEach(element => {
                 const key = element.getAttribute('data-i18n');
@@ -303,7 +314,10 @@
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const email = document.getElementById('loginEmail').value;
+            // Get username and append @demo.com if it's not already an email
+            const rawUsername = document.getElementById('loginUsername').value.trim();
+            const email = rawUsername.includes('@') ? rawUsername : `${rawUsername.toLowerCase()}@demo.com`;
+            
             const password = document.getElementById('loginPassword').value;
             const errorMsg = document.getElementById('loginError');
             const loginBtn = document.getElementById('loginBtn');
@@ -343,6 +357,8 @@
                     
                         document.getElementById('preTrainingForm').classList.add('hidden');
                         document.getElementById('postTrainingForm').classList.add('hidden');
+                        document.getElementById('morningCompleteMsg').classList.add('hidden');
+                        
                         const existingMsg = document.getElementById('allDoneMsg');
                         if (existingMsg) existingMsg.classList.add('hidden');
                     
@@ -362,6 +378,7 @@
                             const data = todayDoc.data();
                     
                             if (data.status === "part_1_complete") {
+                                // If they log back in and Part 1 is done, unlock Part 2
                                 document.getElementById('postTrainingForm').classList.remove('hidden');
                             } else if (data.status === "fully_complete") {
                                 if (!existingMsg) {
@@ -373,6 +390,7 @@
                                 }
                             }
                         } else {
+                            // First time logging in today
                             document.getElementById('preTrainingForm').classList.remove('hidden');
                             
                             document.querySelectorAll('input[type="range"]').forEach(input => {
@@ -381,9 +399,10 @@
                             });
                         }
                         
-                        // Reset language to English by default upon player login
-                        document.getElementById('languageSelect').value = 'en';
-                        window.switchLanguage('en');
+                        // Apply persisted language preference (defaults to English if none saved)
+                        const savedLang = localStorage.getItem('preferredLanguage') || 'en';
+                        document.getElementById('languageSelect').value = savedLang;
+                        window.switchLanguage(savedLang);
                     }
                 } else {
                     throw new Error("Profile not found.");
@@ -391,7 +410,7 @@
 
             } catch (error) {
                 console.error("Login Error:", error);
-                errorMsg.innerText = "Invalid email or password.";
+                errorMsg.innerText = "Invalid username or password.";
                 errorMsg.classList.remove('hidden');
             } finally {
                 loginBtn.innerText = "Log In";
@@ -436,8 +455,9 @@
                 currentSubmissionId = docRef.id;
                 console.log("Success! Document saved with ID: ", docRef.id);
                 
+                // Hide Part 1 and show the "Please log out" message instead of showing Part 2
                 document.getElementById('preTrainingForm').classList.add('hidden');
-                document.getElementById('postTrainingForm').classList.remove('hidden');
+                document.getElementById('morningCompleteMsg').classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
         
             } catch (error) {
