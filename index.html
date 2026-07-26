@@ -169,9 +169,13 @@
 
         <main class="p-4 max-w-5xl mx-auto space-y-6">
             
+            <!-- UPDATED: Added Search Bar -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-                <h2 class="text-2xl font-bold text-gray-800">Today's Overview</h2>
-                <button class="bg-indigo-600 text-white px-4 py-2 rounded text-sm font-medium shadow hover:bg-indigo-700">+ Invite Player</button>
+                <h2 class="text-2xl font-bold text-gray-800">Team Overview</h2>
+                <div class="flex items-center space-x-2 w-full sm:w-auto">
+                    <input type="text" id="playerSearch" onkeyup="filterPlayers()" placeholder="Search player by name..." class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-64">
+                    <button class="bg-indigo-600 text-white px-4 py-2 rounded text-sm font-medium shadow hover:bg-indigo-700 whitespace-nowrap">+ Invite Player</button>
+                </div>
             </div>
 
             <!-- UI Highlight for Medical Attention -->
@@ -181,29 +185,47 @@
                         <span class="text-red-600 font-bold text-lg">⚠️ Action Required</span>
                     </div>
                     <div class="ml-3">
-                        <p class="text-sm text-red-700 font-medium">1 player requested to speak with medical staff today.</p>
+                        <p class="text-sm text-red-700 font-medium">Please review players requesting medical staff.</p>
                     </div>
                 </div>
             </div>
 
             <div class="bg-white rounded shadow overflow-x-auto">
-                <table class="w-full text-left border-collapse min-w-[600px]">
+                <table class="w-full text-left border-collapse min-w-[700px]">
+                    <!-- UPDATED: Added Date Column Header -->
                     <thead>
                         <tr class="bg-gray-100 text-sm uppercase text-gray-600">
                             <th class="p-3 border-b">Player</th>
+                            <th class="p-3 border-b">Date</th>
                             <th class="p-3 border-b">Status</th>
                             <th class="p-3 border-b">Readiness Score</th>
                             <th class="p-3 border-b">Medical Note</th>
+                            <th class="p-3 border-b">Action</th>
                         </tr>
                     </thead>
                     <tbody id="physioTableBody">
                         <tr>
-                            <td colspan="4" class="p-3 text-center text-gray-500">Loading submissions...</td>
+                            <td colspan="6" class="p-3 text-center text-gray-500">Loading submissions...</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </main>
+        <!-- MODAL FOR DETAILED VIEW -->
+        <div id="detailsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 transition-opacity">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 relative">
+                <!-- Close Button -->
+                <button onclick="closeDetailsModal()" class="absolute top-4 right-4 text-gray-500 hover:text-red-600 font-bold text-2xl leading-none">×</button>
+                
+                <h3 class="text-2xl font-bold text-blue-900 mb-4 border-b pb-2" id="modalPlayerName">Player Details</h3>
+                
+                <!-- Content injected dynamically via JavaScript -->
+                <div id="modalContent" class="space-y-4">
+                </div>
+                
+                <button onclick="closeDetailsModal()" class="mt-6 w-full bg-gray-200 text-gray-800 p-3 rounded font-bold hover:bg-gray-300 transition-colors">Close</button>
+            </div>
+        </div>
     </div>
 
     <script type="module">
@@ -230,6 +252,7 @@
         let currentSubmissionId = null;
         let currentUserId = null;
         let currentUserName = "";
+        window.submissionsMap = {};
 
         // The Translation Dictionary (Added morningCompleteMsg)
         const translations = {
@@ -542,6 +565,9 @@
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     
+                    // Store the data in our map using the document ID as the key
+                    window.submissionsMap[doc.id] = data; 
+                    
                     let readinessScore = 0;
                     if (data.metrics) {
                         const total = data.metrics.sleep + data.metrics.fatigue + data.metrics.muscleSoreness + data.metrics.emotionalStress + data.metrics.hydration;
@@ -563,10 +589,14 @@
                     const tr = document.createElement('tr');
                     tr.className = rowClass;
                     tr.innerHTML = `
-                        <td class="p-3 font-bold text-gray-800">${data.playerId}</td>
+                        <td class="p-3 font-bold text-gray-800 player-name-cell">${data.playerId}</td>
+                        <td class="p-3 text-gray-600 font-medium">${data.dateString || 'N/A'}</td>
                         <td class="p-3"><span class="bg-gray-200 text-gray-800 px-2 py-1 rounded text-xs font-medium">${data.status.replace(/_/g, ' ')}</span></td>
                         <td class="p-3 font-bold ${scoreColor}">${readinessScore}%</td>
                         <td class="p-3 ${noteColor}">${medicalNote}</td>
+                        <td class="p-3">
+                            <button onclick="openDetailsModal('${doc.id}')" class="text-indigo-600 hover:text-indigo-800 font-medium text-sm underline">View Details</button>
+                        </td>
                     `;
                     
                     tableBody.appendChild(tr);
@@ -577,6 +607,92 @@
                 tableBody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-red-500">Error loading data. Check console.</td></tr>';
             }
         }
+
+        window.openDetailsModal = function(docId) {
+            const data = window.submissionsMap[docId];
+            if (!data) return;
+
+            // Set the modal title
+            document.getElementById('modalPlayerName').innerHTML = `${data.playerId} - Daily Details<span class="text-sm text-gray-500 font-normal block mt-1">Submission Date: ${data.dateString || 'N/A'}</span>`;
+            
+            // Build the HTML for the detailed view
+            let html = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
+            
+            // Morning Readiness Box
+            html += `
+            <div class="bg-gray-50 p-4 rounded border border-gray-200">
+                <h4 class="font-bold text-blue-800 border-b pb-2 mb-3">Morning Readiness</h4>
+                <ul class="text-sm space-y-2 text-gray-700">
+                    <li class="flex justify-between"><span>Sleep Quality:</span> <span class="font-bold">${data.metrics?.sleep || 'N/A'}/10</span></li>
+                    <li class="flex justify-between"><span>Fatigue:</span> <span class="font-bold">${data.metrics?.fatigue || 'N/A'}/10</span></li>
+                    <li class="flex justify-between"><span>Muscle Soreness:</span> <span class="font-bold">${data.metrics?.muscleSoreness || 'N/A'}/10</span></li>
+                    <li class="flex justify-between"><span>Emotional Stress:</span> <span class="font-bold">${data.metrics?.emotionalStress || 'N/A'}/10</span></li>
+                    <li class="flex justify-between"><span>Hydration:</span> <span class="font-bold">${data.metrics?.hydration || 'N/A'}/10</span></li>
+                </ul>
+            </div>`;
+
+            // Medical Status Box
+            html += `
+            <div class="bg-gray-50 p-4 rounded border border-gray-200">
+                <h4 class="font-bold text-blue-800 border-b pb-2 mb-3">Medical Status</h4>
+                <ul class="text-sm space-y-2 text-gray-700">
+                    <li class="flex justify-between"><span>Fit to Train:</span> <span class="font-bold">${data.medical?.fitToTrain || 'N/A'}</span></li>
+                    <li class="flex justify-between"><span>Injury Today:</span> <span class="font-bold">${data.medical?.injury || 'N/A'}</span></li>
+                    <li class="flex justify-between"><span>Ill Today:</span> <span class="font-bold">${data.medical?.illness || 'N/A'}</span></li>
+                    ${data.medical?.menstruation ? `<li class="flex justify-between"><span>Menstrual Symptoms:</span> <span class="font-bold">${data.medical.menstruation}</span></li>` : ''}
+                </ul>
+            </div>`;
+            
+            html += `</div>`; // Close grid
+
+            // After Training (RPE) Box
+            if (data.status === 'fully_complete' && data.rpe) {
+                html += `
+                <div class="bg-green-50 p-4 rounded border border-green-200 mt-4">
+                    <h4 class="font-bold text-green-800 border-b border-green-200 pb-2 mb-3">After Training (RPE)</h4>
+                    <ul class="text-sm space-y-2 text-gray-700">
+                        <li class="flex justify-between"><span>Pitch Training RPE:</span> <span class="font-bold">${data.rpe.pitch}/10</span></li>
+                        <li class="flex justify-between"><span>Gym Training RPE:</span> <span class="font-bold">${data.rpe.gym}/10</span></li>
+                    </ul>
+                </div>`;
+            } else {
+                html += `
+                <div class="bg-gray-100 p-4 rounded border border-gray-200 mt-4 text-gray-500 italic text-sm text-center">
+                    Player has not yet submitted After Training data.
+                </div>`;
+            }
+
+            // Inject the HTML and show the modal
+            document.getElementById('modalContent').innerHTML = html;
+            document.getElementById('detailsModal').classList.remove('hidden');
+        };
+
+        window.closeDetailsModal = function() {
+            document.getElementById('detailsModal').classList.add('hidden');
+        };
+
+        window.filterPlayers = function() {
+            // Get the search input value and convert it to lowercase
+            const input = document.getElementById('playerSearch').value.toLowerCase();
+            const tableBody = document.getElementById('physioTableBody');
+            const rows = tableBody.getElementsByTagName('tr');
+
+            // Loop through all table rows
+            for (let i = 0; i < rows.length; i++) {
+                // Find the specific cell that holds the player's name
+                const nameCell = rows[i].querySelector('.player-name-cell');
+                
+                if (nameCell) {
+                    const playerName = nameCell.textContent || nameCell.innerText;
+                    // If the name includes the typed letters, show the row, otherwise hide it
+                    if (playerName.toLowerCase().indexOf(input) > -1) {
+                        rows[i].style.display = "";
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                }
+            }
+        };
     </script>
 </body>
 </html>
